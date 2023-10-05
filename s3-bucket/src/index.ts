@@ -1,4 +1,4 @@
-import { GetObjectCommand, ListObjectsV2Command, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, GetObjectCommand, ListObjectsV2Command, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import dotenv from "dotenv";
 dotenv.config();
@@ -57,6 +57,15 @@ async function listObjects() {
   console.log("result: ", result);
 }
 
+function deleteObject(key: string) {
+  const cmd = new DeleteObjectCommand({
+    Bucket: privateBucketName,
+    Key: key,
+  });
+  const result = s3Client.send(cmd);
+  return result;
+}
+
 async function main() {
     console.log("URL: ", await getObjectURL("uploads/img-1696499868012.jpeg"));
 }
@@ -66,4 +75,5 @@ async function upload() {
 // main();
 
 // upload();
+deleteObject("Feed.mp4");
 listObjects();
