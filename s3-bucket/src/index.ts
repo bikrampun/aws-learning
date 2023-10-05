@@ -1,4 +1,4 @@
-import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import dotenv from "dotenv";
 dotenv.config();
@@ -29,7 +29,7 @@ const s3Client = new S3Client({
 
 async function getObjectURL(key: string) {
     const cmd = new GetObjectCommand({
-        Bucket: publicBucketName,
+        Bucket: privateBucketName,
         Key: key,
     });
     console.log("cmd: ", cmd);
@@ -37,8 +37,23 @@ async function getObjectURL(key: string) {
     return url;
 }
 
-async function main() {
-    console.log("URL: ", await getObjectURL("bikram.jpg"));
+async function putObject(filename: string, contentType: string) {
+  const cmd = new PutObjectCommand({
+    Bucket: privateBucketName,
+    Key: `uploads/${filename}`,
+    ContentType: contentType,
+  });
+  console.log("cmd: ", cmd);
+  const url = await getSignedUrl(s3Client, cmd, { expiresIn: 180 });
+  return url;
 }
 
-main();
+async function main() {
+    console.log("URL: ", await getObjectURL("uploads/img-1696499868012.jpeg"));
+}
+async function upload() {
+  console.log("URL for uploading: ", await putObject(`img-${Date.now()}.jpeg`, "image/jpeg"));
+}
+// main();
+
+upload();
